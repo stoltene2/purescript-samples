@@ -7,6 +7,7 @@ import Data.List (List(..), filter, head, nubBy)
 import Data.Maybe (Maybe)
 
 
+
 newtype Entry = Entry
   { firstName :: String
   , lastName :: String
@@ -19,11 +20,65 @@ newtype Address = Address
   , state :: String
   }
 
+newtype PhoneNumber = PhoneNumber
+  { "type" :: PhoneType
+  , number :: String
+  }
+
+newtype Person = Person
+  { firstName   :: String
+  , lastName    :: String
+  , homeAddress :: Address
+  , phones      :: Array PhoneNumber
+  }
+
+
+data PhoneType = HomePhone | WorkPhone | CellPhone | OtherPhone
 
 type AddressBook = List Entry
 
+person :: String -> String -> Address -> Array PhoneNumber -> Person
+person firstName lastName homeAddress phones =
+  Person { firstName, lastName, homeAddress, phones }
+
 address :: String -> String -> String -> Address
-address street city state = Address {street, city, state}
+address street city state = Address { street, city, state }
+
+phoneNumber :: PhoneType -> String -> PhoneNumber
+phoneNumber ty number = PhoneNumber
+  { "type": ty
+  , number: number
+  }
+
+instance showAddress :: Show Address where
+  show (Address o) = "Address " <>
+    "{ street: " <> show o.street <>
+    ", city: "   <> show o.city <>
+    ", state: "  <> show o.state <>
+    " }"
+
+
+instance showPhoneType :: Show PhoneType where
+  show HomePhone = "HomePhone"
+  show WorkPhone = "WorkPhone"
+  show CellPhone = "CellPhone"
+  show OtherPhone = "OtherPhone"
+
+
+instance showPhoneNumber :: Show PhoneNumber where
+  show (PhoneNumber o) = "PhoneNumber " <>
+    "{ type: "   <> show o."type" <>
+    ", number: " <> show o.number <>
+    " }"
+
+
+instance showPerson :: Show Person where
+  show (Person o) = "Person " <>
+    "{ firstName: "   <> show o.firstName <>
+    ", lastName: "    <> show o.lastName <>
+    ", homeAddress: " <> show o.homeAddress <>
+    ", phones: "      <> show o.phones <>
+    " }"
 
 
 instance showEntry :: Show Entry where
@@ -35,8 +90,13 @@ instance eqEntry :: Eq Entry where
   eq (Entry e1) (Entry e2) = e1.firstName == e2.firstName && e1.lastName == e2.lastName
 
 
-instance showAddress :: Show Address where
-  show (Address a) = a.street <> ", " <> a.city <> ", " <> a.state
+examplePerson :: Person
+examplePerson =
+  person "John" "Smith"
+         (address "123 Fake St." "FakeTown" "CA")
+         [ phoneNumber HomePhone "555-555-5555"
+         , phoneNumber CellPhone "555-555-0000"
+         ]
 
 
 emptyBook :: AddressBook
